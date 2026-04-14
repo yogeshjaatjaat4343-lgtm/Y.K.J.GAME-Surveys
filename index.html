@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Survey Earn</title>
+
+<style>
+body {
+    margin:0;
+    background:#000;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+}
+.box {
+    margin:20px;
+    padding:20px;
+    border:2px solid gold;
+    border-radius:15px;
+    background:#111;
+}
+.btn {
+    width:90%;
+    padding:12px;
+    margin:10px;
+    border:none;
+    border-radius:8px;
+    font-weight:bold;
+}
+input {
+    width:80%;
+    padding:10px;
+    margin-top:10px;
+    border-radius:8px;
+    border:1px solid gold;
+    background:#000;
+    color:white;
+    text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<h2 style="color:gold;">🧾 Survey Earn System</h2>
+
+<div class="box">
+
+<p>Coins: <span id="coins">0</span></p>
+<p style="font-size:12px;">100 Coins = ₹1</p>
+<p id="minText" style="font-size:12px;">Min Withdraw = ₹1</p>
+<p>Today: <span id="count">0</span>/4</p>
+
+<!-- SURVEY BUTTONS -->
+<button class="btn" style="background:#00cec9;" onclick="startCPX()">START SURVEY - CPX</button>
+
+<button class="btn" style="background:#6c5ce7;" onclick="startBitLabs()">START SURVEY - BITLABS</button>
+<button class="btn" style="background:#f1c40f;" onclick="dailyBonus()">🎁 DAILY BONUS</button>
+<br>
+<input type="text" id="upi" placeholder="Enter UPI ID">
+<button class="btn" style="background:#2ecc71;" onclick="withdraw()">WITHDRAW</button>
+</div>
+<script>
+// USER ID
+let userId = localStorage.getItem("uid");
+if(!userId){
+    userId = "user_" + Math.random().toString(36).substring(7);
+    localStorage.setItem("uid", userId);
+}
+
+// DATA
+let coins = 0;
+let count = parseInt(localStorage.getItem("surveyCount")) || 0;
+let lastDate = localStorage.getItem("surveyDate") || "";
+let bonusDate = localStorage.getItem("bonusDate") || "";
+let firstWithdrawDone = localStorage.getItem("firstWithdraw") || "no";
+
+// RESET DAILY
+function checkDate(){
+    let today = new Date().toDateString();
+    if(today !== lastDate){
+        count = 0;
+        localStorage.setItem("surveyCount", 0);
+        localStorage.setItem("surveyDate", today);
+    }
+}
+function dailyBonus(){
+    let today = new Date().toDateString();
+
+    if(bonusDate === today){
+        alert("आज का bonus already ले लिया");
+        return;
+    }
+
+    coins += 50;
+    bonusDate = today;
+
+    localStorage.setItem("bonusDate", today);
+
+    alert("🎁 50 Coins Added");
+    update();
+}
+// UPDATE UI
+function update(){
+    document.getElementById("coins").innerText = coins;
+    document.getElementById("count").innerText = count;
+
+    let min = firstWithdrawDone === "yes" ? 250 : 1;
+    document.getElementById("minText").innerText = "Min Withdraw = ₹" + min;
+}
+
+// LOAD FROM BACKEND
+async function loadCoins(){
+    try{
+        let res = await fetch("https://y-k-j-game-surveys.onrender.com/user/" + userId);
+        let data = await res.json();
+        coins = data.coins;
+        update();
+    }catch(e){
+        console.log("Backend not reachable");
+    }
+}
+// ======================
+// SURVEY LINKS (EMPTY)
+// ======================
+let CPX_LINK = "";     // 👈 यहाँ बाद में डालना
+let BITLABS_LINK = "";  // 👈 यहाँ बाद में डालना
+// START CPX
+function startCPX(){
+    if(!CPX_LINK){
+        alert("CPX link not added yet");
+        return;
+    }
+    window.location.href = CPX_LINK + "?ext_user_id=" + userId;
+}
+// START BITLABS
+function startBitLabs(){
+    if(!BITLABS_LINK){
+        alert("BitLabs link not added yet");
+        return;
+    }
+    window.location.href = BITLABS_LINK + "?user_id=" + userId;
+}
+// WITHDRAW
+function withdraw(){
+
+    let upi = document.getElementById("upi").value;
+
+    if(!upi){
+        alert("Enter UPI");
+        return;
+    }
+    let minCoins = (firstWithdrawDone === "no") ? 100 : 25000;
+
+    if(coins < minCoins){
+        alert("Minimum ₹" + (minCoins/100) + " required");
+        return;
+    }
+
+    // 💥 STEP 1: AMOUNT CALCULATE
+    let amount = coins / 100;
+
+    // 💥 STEP 2: INSTANT COIN DEDUCT (IMPORTANT)
+    let deductedCoins = coins;
+    coins = 0;
+
+    // 💥 STEP 3: MARK FIRST WITHDRAW DONE
+    localStorage.setItem("firstWithdraw", "yes");
+
+    // 💥 STEP 4: UPDATE UI IMMEDIATELY
+    update();
+
+    // 💥 STEP 5: SEND MESSAGE
+    let msg = `Withdraw Request
+Coins: ${deductedCoins}
+Amount: ₹${amount}
+UPI: ${upi}`;
+
+    let url = "https://wa.me/916375843097?text=" + encodeURIComponent(msg);
+
+    window.open(url, "_blank");
+
+    alert("Withdraw request sent. Coins deducted.");
+
+}
+// INIT
+checkDate();
+loadCoins();
+update();
+
+</script>
+
+</body>
+</html>

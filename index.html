@@ -38,45 +38,57 @@ input {
     color:white;
     text-align:center;
 }
+#earnBtn1 {
+    background: linear-gradient(45deg, #ff7675, #fd79a8);
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 0 10px #ff7675;
+    transition: 0.3s;
+}
+#earnBtn1:hover {
+    transform: scale(1.05);
+}
+
+#earnBtn2 {
+    background: linear-gradient(45deg, #00cec9, #0984e3);
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 0 10px #00cec9;
+    transition: 0.3s;
+}
+#earnBtn2:hover {
+    transform: scale(1.05);
+}
 </style>
 </head>
-
 <body>
-
 <h2 style="color:gold;">🧾 Survey Earn System</h2>
-
 <div class="box">
-
 <p>Coins: <span id="coins">0</span></p>
 <p style="font-size:12px;">100 Coins = ₹1</p>
 <p id="minText" style="font-size:12px;">Min Withdraw = ₹1</p>
 <p>Today: <span id="count">0</span>/4</p>
-
 <!-- SURVEY BUTTONS -->
-<button class="btn" style="background:#00cec9;" onclick="startCPX()">START SURVEY - CPX</button>
-
+<button class="btn" style="background:#00cec9;" onclick="startCPX()">START SURVEY - timewall</button>
 <button class="btn" style="background:#6c5ce7;" onclick="startBitLabs()">START SURVEY - BITLABS</button>
 <button class="btn" style="background:#f1c40f;" onclick="dailyBonus()">🎁 DAILY BONUS</button>
+<button class="btn" id="earnBtn1" onclick="startAd()">💰 Watch Ad & Earn</button>
+<button class="btn" id="earnBtn2" onclick="startAd()">🚀 Instant Reward Task</button>
 <br>
 <input type="text" id="upi" placeholder="Enter UPI ID">
 <button class="btn" style="background:#2ecc71;" onclick="withdraw()">WITHDRAW</button>
 </div>
 <script>
-// USER ID
 let userId = localStorage.getItem("uid");
 if(!userId){
     userId = "user_" + Math.random().toString(36).substring(7);
     localStorage.setItem("uid", userId);
 }
-
-// DATA
-let coins = 0;
+let coins = parseInt(localStorage.getItem("surveyCoins")) || 0;
 let count = parseInt(localStorage.getItem("surveyCount")) || 0;
 let lastDate = localStorage.getItem("surveyDate") || "";
 let bonusDate = localStorage.getItem("bonusDate") || "";
 let firstWithdrawDone = localStorage.getItem("firstWithdraw") || "no";
-
-// RESET DAILY
 function checkDate(){
     let today = new Date().toDateString();
     if(today !== lastDate){
@@ -87,46 +99,46 @@ function checkDate(){
 }
 function dailyBonus(){
     let today = new Date().toDateString();
-
     if(bonusDate === today){
         alert("आज का bonus already ले लिया");
         return;
     }
-
     coins += 50;
+    fetch("https://y-k-j-game-surveys.onrender.com/update", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+        userId: userId,
+        coins: coins
+    })
+});
+    localStorage.setItem("surveyCoins", coins);
     bonusDate = today;
-
     localStorage.setItem("bonusDate", today);
-
     alert("🎁 50 Coins Added");
     update();
 }
-// UPDATE UI
 function update(){
     document.getElementById("coins").innerText = coins;
     document.getElementById("count").innerText = count;
-
     let min = firstWithdrawDone === "yes" ? 250 : 1;
     document.getElementById("minText").innerText = "Min Withdraw = ₹" + min;
 }
-
-// LOAD FROM BACKEND
 async function loadCoins(){
     try{
         let res = await fetch("https://y-k-j-game-surveys.onrender.com/user/" + userId);
         let data = await res.json();
-        coins = data.coins;
+        coins = Math.max(coins, data.coins || 0);
+localStorage.setItem("surveyCoins", coins);
         update();
     }catch(e){
         console.log("Backend not reachable");
     }
 }
-// ======================
-// SURVEY LINKS (EMPTY)
-// ======================
-let CPX_LINK = "";     // 👈 यहाँ बाद में डालना
-let BITLABS_LINK = "";  // 👈 यहाँ बाद में डालना
-// START CPX
+let CPX_LINK = "https://timewall.io/users/login?oid=e758de0231cee508&uid={UNIQUE_USER_ID}";
+let BITLABS_LINK = "";  
 function startCPX(){
     if(!CPX_LINK){
         alert("CPX link not added yet");
@@ -134,7 +146,6 @@ function startCPX(){
     }
     window.location.href = CPX_LINK + "?ext_user_id=" + userId;
 }
-// START BITLABS
 function startBitLabs(){
     if(!BITLABS_LINK){
         alert("BitLabs link not added yet");
@@ -142,54 +153,62 @@ function startBitLabs(){
     }
     window.location.href = BITLABS_LINK + "?user_id=" + userId;
 }
-// WITHDRAW
 function withdraw(){
-
     let upi = document.getElementById("upi").value;
-
     if(!upi){
         alert("Enter UPI");
         return;
     }
     let minCoins = (firstWithdrawDone === "no") ? 100 : 25000;
-
     if(coins < minCoins){
         alert("Minimum ₹" + (minCoins/100) + " required");
         return;
     }
-
-    // 💥 STEP 1: AMOUNT CALCULATE
     let amount = coins / 100;
-
-    // 💥 STEP 2: INSTANT COIN DEDUCT (IMPORTANT)
     let deductedCoins = coins;
     coins = 0;
-
-    // 💥 STEP 3: MARK FIRST WITHDRAW DONE
+    localStorage.setItem("surveyCoins", coins);
     localStorage.setItem("firstWithdraw", "yes");
-
-    // 💥 STEP 4: UPDATE UI IMMEDIATELY
+    fetch("https://y-k-j-game-surveys.onrender.com/update", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+        userId: userId,
+        coins: 0
+    })
+});
     update();
-
-    // 💥 STEP 5: SEND MESSAGE
     let msg = `Withdraw Request
 Coins: ${deductedCoins}
 Amount: ₹${amount}
 UPI: ${upi}`;
-
     let url = "https://wa.me/916375843097?text=" + encodeURIComponent(msg);
-
     window.open(url, "_blank");
-
     alert("Withdraw request sent. Coins deducted.");
-
 }
-// INIT
 checkDate();
 loadCoins();
 update();
-
+let adStartTime = 0;
+function startAd(){
+    adStartTime = Date.now();
+    window.location.href = "https://www.profitablecpmratenetwork.com/tet8ney19?key=f087d6d9ebc742fdc39a8d4b69790990";
+}
+window.addEventListener("focus", function(){
+    if(adStartTime === 0) return;
+    let timeSpent = (Date.now() - adStartTime) / 1000;
+    if(timeSpent >= 10){
+        coins += 10;
+        localStorage.setItem("surveyCoins", coins);
+        alert("🎉 10 Coins Earned!");
+        update();
+    } else {
+        alert("❌ Stay at least 10 seconds to earn coins!");
+    }
+    adStartTime = 0;
+});
 </script>
-
 </body>
 </html>

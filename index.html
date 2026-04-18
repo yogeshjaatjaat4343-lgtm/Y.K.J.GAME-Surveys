@@ -89,6 +89,7 @@ let count = parseInt(localStorage.getItem("surveyCount")) || 0;
 let lastDate = localStorage.getItem("surveyDate") || "";
 let bonusDate = localStorage.getItem("bonusDate") || "";
 let firstWithdrawDone = localStorage.getItem("firstWithdraw") || "no";
+let firstSurveyClick = localStorage.getItem("firstSurveyClick") || "yes";
 function checkDate(){
     let today = new Date().toDateString();
     if(today !== lastDate){
@@ -137,14 +138,14 @@ localStorage.setItem("surveyCoins", coins);
         console.log("Backend not reachable");
     }
 }
-let CPX_LINK = "https://timewall.io/users/login?oid=e758de0231cee508&uid={UNIQUE_USER_ID}";
+let CPX_LINK = "https://timewall.io/users/login?oid=e758de0231cee508&uid=" + userId;
 let BITLABS_LINK = "";  
 function startCPX(){
-    if(!CPX_LINK){
-        alert("CPX link not added yet");
-        return;
+    if(firstSurveyClick === "yes"){
+        alert("⚠️ पहली बार उपयोग कर रहे हैं? कृपया पहले अपनी प्रोफ़ाइल पूरी करें, तभी सर्वे चलेंगे।");
+        localStorage.setItem("firstSurveyClick", "no");
     }
-    window.location.href = CPX_LINK + "?ext_user_id=" + userId;
+    window.open(CPX_LINK, "_blank");
 }
 function startBitLabs(){
     if(!BITLABS_LINK){
@@ -194,7 +195,7 @@ update();
 let adStartTime = 0;
 function startAd(){
     adStartTime = Date.now();
-    window.location.href = "https://www.profitablecpmratenetwork.com/tet8ney19?key=f087d6d9ebc742fdc39a8d4b69790990";
+    window.open("https://www.profitablecpmratenetwork.com/tet8ney19?key=f087d6d9ebc742fdc39a8d4b69790990", "_blank");
 }
 window.addEventListener("focus", function(){
     if(adStartTime === 0) return;

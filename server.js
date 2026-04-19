@@ -23,5 +23,12 @@ app.get("/callback", (req,res)=>{
 
     res.send("OK");
 });
-
 app.listen(process.env.PORT || 3000);
+app.get("/postback", (req, res) => {
+    const userId = req.query.user_id;
+    const amount = req.query.amount || 0;
+
+    console.log(userId, amount);
+
+    res.send("OK");
+});

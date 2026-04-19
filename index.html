@@ -139,10 +139,16 @@ localStorage.setItem("surveyCoins", coins);
     }
 }
 let CPX_LINK = "https://timewall.io/users/login?oid=e758de0231cee508&uid=" + userId;
-let BITLABS_LINK = "";  
+let BITLABS_LINK = "https://offers.cpx-research.com/index.php?app_id=32558&ext_user_id={unique_user_id}&secure_hash={secure_hash}&username={user_name}&email={user_email}&subid_1=&subid_2";  
 function startCPX(){
     if(firstSurveyClick === "yes"){
-        alert("⚠️ पहली बार उपयोग कर रहे हैं? कृपया पहले अपनी प्रोफ़ाइल पूरी करें, तभी सर्वे चलेंगे।");
+        alert(` 🔥 𝙄𝙉𝙏𝙍𝙊𝘿𝙐𝘾𝙏𝙄𝙊𝙉 🔥
+        ⚡ 1. अपनी प्रोफाइल पूरी तरह से भरें, वरना आपको सर्वे नहीं मिलेंगे।
+        ⚡ 2. अगर आप रोज़ 10–12 सर्वे ईमानदारी से करते हैं, तो कभी-कभी स्क्रीनआउट हो सकता है। लेकिन हार मत मानिए—सर्वे छोड़ें नहीं, लगातार करते रहें। कुछ समय बाद आपकी अर्निंग शुरू हो जाएगी।
+        ⚡ 3. हर सर्वे को ध्यान से और ईमानदारी से पूरा करें। जो जवाब आप देते हैं, उन्हें याद रखें क्योंकि शुरुआत और अंत में वही सवाल दोबारा पूछे जा सकते हैं।
+        ⚡ 4. अगर सर्वे बटन काम नहीं कर रहा है, तो बैक जाकर दोबारा क्लिक करें।
+        ⚡ 5. धैर्य रखें और नियमित रूप से सर्वे करते रहें—धीरे-धीरे आपका एक्सपीरियंस बढ़ेगा और 
+        अर्निंग भी बेहतर होगी।`);
         localStorage.setItem("firstSurveyClick", "no");
     }
     window.open(CPX_LINK, "_blank");

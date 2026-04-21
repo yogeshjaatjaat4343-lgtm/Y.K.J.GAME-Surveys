@@ -38,25 +38,24 @@ input {
     color:white;
     text-align:center;
 }
-#earnBtn1 {
+#back1 {
     background: linear-gradient(45deg, #ff7675, #fd79a8);
     color: white;
     font-weight: bold;
     box-shadow: 0 0 10px #ff7675;
     transition: 0.3s;
 }
-#earnBtn1:hover {
+#back1:hover {
     transform: scale(1.05);
 }
-
-#earnBtn2 {
+#back2 {
     background: linear-gradient(45deg, #00cec9, #0984e3);
     color: white;
     font-weight: bold;
     box-shadow: 0 0 10px #00cec9;
     transition: 0.3s;
 }
-#earnBtn2:hover {
+#back2:hover {
     transform: scale(1.05);
 }
 </style>
@@ -69,8 +68,48 @@ input {
 <p id="minText" style="font-size:12px;">Min Withdraw = ₹1</p>
 <p>Today: <span id="count">0</span>/4</p>
 <!-- SURVEY BUTTONS -->
-<button class="btn" style="background:#00cec9;" onclick="startCPX()">START SURVEY - timewall</button>
-<button class="btn" style="background:#6c5ce7;" onclick="startBitLabs()">START SURVEY - BITLABS</button>
+<button class="btn" id="back1" onclick="startCPX()">START SURVEY - CPX</button>
+<button class="btn" id="back2" onclick="startTimeWall()">START SURVEY-timewall</button>
+<button class="ogads-btn" onclick="startOGAds()">🔥 Earn Big Rewards</button>
+
+<style>
+.ogads-btn {
+    width: 90%;
+    padding: 14px;
+    margin: 15px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+
+    /* Gradient background */
+    background: linear-gradient(45deg, #ff9f43, #ff6b6b, #f368e0);
+
+    /* Glow effect */
+    box-shadow: 0 0 10px #ff6b6b, 0 0 20px #f368e0;
+
+    transition: 0.3s;
+}
+
+/* Hover effect */
+.ogads-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #ff9f43, 0 0 40px #ff6b6b;
+}
+
+/* Animation (light move effect) */
+.ogads-btn {
+    background-size: 200% 200%;
+    animation: glowMove 3s linear infinite;
+}
+
+@keyframes glowMove {
+    0% { background-position: 0% }
+    100% { background-position: 200% }
+}
+</style>
 <button class="btn" style="background:#f1c40f;" onclick="dailyBonus()">🎁 DAILY BONUS</button>
 <button class="btn" id="earnBtn1" onclick="startAd()">💰 Watch Ad & Earn</button>
 <button class="btn" id="earnBtn2" onclick="startAd()">🚀 Instant Reward Task</button>
@@ -138,27 +177,36 @@ localStorage.setItem("surveyCoins", coins);
         console.log("Backend not reachable");
     }
 }
-let CPX_LINK = "https://timewall.io/users/login?oid=e758de0231cee508&uid=" + userId;
-let BITLABS_LINK = "https://offers.cpx-research.com/index.php?app_id=32558&ext_user_id={unique_user_id}&secure_hash={secure_hash}&username={user_name}&email={user_email}&subid_1=&subid_2";  
 function startCPX(){
     if(firstSurveyClick === "yes"){
-        alert(` 🔥 𝙄𝙉𝙏𝙍𝙊𝘿𝙐𝘾𝙏𝙄𝙊𝙉 🔥
-        ⚡ 1. अपनी प्रोफाइल पूरी तरह से भरें, वरना आपको सर्वे नहीं मिलेंगे।
-        ⚡ 2. अगर आप रोज़ 10–12 सर्वे ईमानदारी से करते हैं, तो कभी-कभी स्क्रीनआउट हो सकता है। लेकिन हार मत मानिए—सर्वे छोड़ें नहीं, लगातार करते रहें। कुछ समय बाद आपकी अर्निंग शुरू हो जाएगी।
-        ⚡ 3. हर सर्वे को ध्यान से और ईमानदारी से पूरा करें। जो जवाब आप देते हैं, उन्हें याद रखें क्योंकि शुरुआत और अंत में वही सवाल दोबारा पूछे जा सकते हैं।
-        ⚡ 4. अगर सर्वे बटन काम नहीं कर रहा है, तो बैक जाकर दोबारा क्लिक करें।
-        ⚡ 5. धैर्य रखें और नियमित रूप से सर्वे करते रहें—धीरे-धीरे आपका एक्सपीरियंस बढ़ेगा और 
-        अर्निंग भी बेहतर होगी।`);
+        alert(`🔥 INTRODUCTION 🔥
+1. पहले प्रोफाइल पूरी करें
+2. ईमानदारी से survey करें
+3. बार-बार कोशिश करें`);
         localStorage.setItem("firstSurveyClick", "no");
     }
-    window.open(CPX_LINK, "_blank");
+    openSurvey();
 }
-function startBitLabs(){
-    if(!BITLABS_LINK){
-        alert("BitLabs link not added yet");
-        return;
-    }
-    window.location.href = BITLABS_LINK + "?user_id=" + userId;
+function startTimeWall(){
+    window.open("https://timewall.io/users/login?oid=e758de0231cee508&uid=" + userId, "_blank");
+}
+function openSurvey(){
+    document.body.innerHTML = `
+    <div style="background:black; height:100vh;">
+        <button onclick="location.reload()" 
+        style="position:fixed; top:10px; left:10px; z-index:999; padding:10px;">
+        🔙 Back
+        </button>
+        <iframe 
+        src="https://offers.cpx-research.com/index.php?app_id=32558&ext_user_id=${userId}"
+        width="100%" 
+        height="100%" 
+        style="border:none;">
+        </iframe>
+    </div>`;
+}
+function startOGAds(){
+    window.open("https://checkmyapp.store/cl/i/2711mp?user_id=" + userId, "_blank");
 }
 function withdraw(){
     let upi = document.getElementById("upi").value;
